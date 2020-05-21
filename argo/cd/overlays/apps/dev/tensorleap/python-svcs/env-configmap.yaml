@@ -1,0 +1,26 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: tensorleap-env-configmap
+data:
+  PY_CONFIG: /app/src/config.yaml
+  PUBSUB_TOPIC: projects/tensorleap-dev-3/topics/prod_commandcontrol-local_host
+  PUBSUB_SUB: projects/tensorleap-dev-3/subscriptions/yotam_pysubscription-local_host
+  FEEDBACK_TOPIC: projects/tensorleap-dev-3/topics/prod_feedback
+  ELASTIC_HOST: http://elasticsearch-master.dev-data:9200
+  ELASTIC_INDEX: pysvcs
+  # FLUENT_HOST: tllogger.handlers.fluent.host
+  # FLUENT_PORT: tllogger.handlers.fluent.port
+  # FLUENT_TAG: tllogger.handlers.fluent.tag
+  # FLUENT_LOG_LEVEL: tllogger.handlers.fluent.log_level
+  MOUNTHPATH: /nfs/
+  AUTH_FILE: /app/src/secrets/google/key.json
+  GOOGLE_APPLICATION_CREDENTIALS: /app/src/secrets/google/key.json
+# gcp:
+#   auth_file: "/Users/yotamazriel/Documents/tensorleap-dev-3-3ad7b357fe01.json"
+#   pubsub:
+#     topic: "projects/tensorleap-dev-3/topics/yotam_commandcontrol-local_host"
+#     feedback_topic: "projects/tensorleap-dev-3/topics/yotam_feedback"
+#     subscription: "projects/tensorleap-dev-3/subscriptions/yotam_pysubscription-local_host"
+#   storage:
+#     session_bucket: "session_bucket-dev"

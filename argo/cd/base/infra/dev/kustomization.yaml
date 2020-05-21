@@ -1,0 +1,11 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - namespaces.yaml
+  - clusterIssuer-letsencrypt-prod.yaml
+  - infra-dev-secret.yaml
+  - mongodb.yaml
+  - elasticsearch.yaml
+  - kibana.yaml
+  - ci-nfs-server-provisioner.yaml

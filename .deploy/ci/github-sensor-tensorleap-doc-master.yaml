@@ -1,0 +1,194 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Sensor
+metadata:
+  name: github-sensor-tensorleap-doc-master
+  labels:
+    # sensor controller with instanceId "argo-events" will process this sensor
+    sensors.argoproj.io/sensor-controller-instanceid: argo-events
+    app.kubernetes.io/instance: ci-events
+spec:
+  template:
+    spec:
+      containers:
+        - name: sensor
+          image: argoproj/sensor:v0.14.0
+          imagePullPolicy: Always
+      serviceAccountName: argo-events-sa
+  dependencies:
+    - name: github-dep
+      gatewayName: github-gateway
+      eventName: infra
+      filters:
+        name: ref-filter
+        data:
+          - path: body.ref
+            type: string
+            comparator: "="
+            value:
+              - "refs/heads/master"
+  subscription:
+    http:
+      port: 9300
+  triggers:
+    - template:
+        name: github-workflow-trigger
+        k8s:
+          group: argoproj.io
+          version: v1alpha1
+          resource: workflows
+          operation: create
+          parameters:
+            # hack using body.unknown bring from configmap ?!
+            - src:
+                dependencyName: github-dep
+                dataKey: body.unknown
+                value: doc
+              dest: spec.arguments.parameters.5.value
+            - src:
+                dependencyName: github-dep
+                dataKey: body.unknown
+                value: gcr.io
+              dest: spec.arguments.parameters.3.value
+            - src:
+                dependencyName: github-dep
+                dataKey: body.unknown
+                value: gcr.io
+              dest: spec.arguments.parameters.3.value
+            - src:
+                dependencyName: github-dep
+                dataKey: body.unknown2
+                value: tensorleap-dev-3
+              dest: spec.arguments.parameters.4.value
+            - src:
+                dependencyName: github-dep
+                dataKey: body.repository.ssh_url
+              dest: spec.arguments.parameters.0.value
+            - src:
+                dependencyName: github-dep
+                dataTemplate: "{{ .Input.body.ref }}"
+              dest: spec.arguments.parameters.1.value
+            - src:
+                dependencyName: github-dep
+                dataTemplate: "{{ .Input.body.head_commit.id }}"
+              dest: spec.arguments.parameters.2.value
+            - src:
+                dependencyName: github-dep
+                dataTemplate: "{{ .Input.body.repository.owner.name | lower }}-{{ .Input.body.repository.name | lower }}-{{ .Input.body.head_commit.id | substr 0 7 }}-"
+              dest: metadata.generateName
+              operation: append
+          source:
+            resource:
+              apiVersion: argoproj.io/v1alpha1
+              kind: Workflow
+              metadata:
+                # [event-source]-[organization]-[repository]-[short-sha-1]-[unique-id]
+                generateName: github-
+              spec:
+                volumes:
+                  - name: google-cloud-key
+                    secret:
+                      secretName: gcp-sa-secret
+                entrypoint: main
+                arguments:
+                  parameters:
+                    # the values will get overridden by event payload from github-dep
+                    - name: repo
+                    - name: revision
+                    - name: commit
+                    - name: dockerRepo
+                    - name: gcpProjectId
+                    - name: componentName
+                templates:
+                  - name: main
+                    arguments: {}
+                    outputs: {}
+                    metadata: {}
+                    inputs:
+                      parameters:
+                        - name: repo
+                        - name: revision
+                        - name: commit
+                        - name: dockerRepo
+                        - name: gcpProjectId
+                        - name: componentName
+                    steps:
+                      - - name: docker-build
+                          template: docker-build
+                          arguments:
+                            parameters:
+                              - name: repo
+                                value: "{{inputs.parameters.repo}}"
+                              - name: revision
+                                value: "{{inputs.parameters.revision}}"
+                              - name: commit
+                                value: "{{inputs.parameters.commit}}"
+                              - name: dockerRepo
+                                value: "{{inputs.parameters.dockerRepo}}"
+                              - name: gcpProjectId
+                                value: "{{inputs.parameters.gcpProjectId}}"
+                              - name: componentName
+                                value: "{{inputs.parameters.componentName}}"
+                  - name: docker-build
+                    arguments: {}
+                    inputs:
+                      parameters:
+                        - name: repo
+                        - name: revision
+                        - name: commit
+                        - name: dockerRepo
+                        - name: gcpProjectId
+                        - name: componentName
+                      artifacts:
+                        - name: code
+                          path: /src
+                          git:
+                            repo: "{{inputs.parameters.repo}}"
+                            revision: "{{inputs.parameters.revision}}"
+                            sshPrivateKeySecret:
+                              name: github-secret
+                              key: sshPrivateKey
+                    container:
+                      image: google/cloud-sdk:290.0.1-alpine
+                      command: [sh, -c]
+                      env:
+                        - name: DOCKER_HOST
+                          value: 127.0.0.1
+                        - name: GOOGLE_APPLICATION_CREDENTIALS
+                          value: /src/secrets/google/key.json
+                        - name: APP_VERSION
+                          value: "{{inputs.parameters.commit}}"
+                        - name: DOCKER_REPO
+                          value: "{{inputs.parameters.dockerRepo}}"
+                        - name: COMPONENT_NAME
+                          value: "{{inputs.parameters.componentName}}"
+                        - name: GCP_PROJECT_ID
+                          value: "{{inputs.parameters.gcpProjectId}}"
+                      workingDir: /src
+                      volumeMounts:
+                        - name: google-cloud-key
+                          mountPath: /src/secrets/google/
+                          readOnly: true
+                      args: [
+                          'until docker ps; do sleep 3; done &&
+                          docker ps -a &&
+                          echo Google auth file mounted to :: $GOOGLE_APPLICATION_CREDENTIALS &&
+                          gcloud auth activate-service-account gke-node@$GCP_PROJECT_ID.iam.gserviceaccount.com --key-file=$GOOGLE_APPLICATION_CREDENTIALS --project=$GCP_PROJECT_ID &&
+                          cat $GOOGLE_APPLICATION_CREDENTIALS | docker login -u _json_key --password-stdin https://$DOCKER_REPO &&
+                          make release &&
+                          cd /infra-code/argo/cd/overlays/apps/dev/$COMPONENT_NAME &&
+                          ssh-keyscan -t rsa github.com >> ~/.ssh/known_hosts &&
+                          git config --global user.email "tlbot@tensorleap.ai" &&
+                          git config --global user.name "TLBOT" &&
+                          docker run -v $PWD:/tmp/ --workdir=/tmp traherom/kustomize-docker:2.0.0 kustomize edit set image $DOCKER_REPO/$GCP_PROJECT_ID/$COMPONENT_NAME:${APP_VERSION} &&
+                          echo $COMPONENT_NAME set to version ${APP_VERSION} &&
+                          ls -l &&
+                          git status &&
+                          git commit -am "Updating $COMPONENT_NAME to $APP_VERSION" &&
+                          git push origin master && echo "kustomize git commit success"',
+                        ]
+                    sidecars:
+                      - name: dind
+                        image: docker:18.09.4-dind
+                        securityContext:
+                          privileged: true
+                        mirrorVolumeMounts: true

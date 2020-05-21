@@ -1,0 +1,23 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+commonLabels:
+  group: shared-infra
+  variant: shared
+
+commonAnnotations:
+  environment: Shared
+  group: infra-services
+
+resources:
+  - ../../../base/infra/shared
+
+patchesStrategicMerge:
+  - ci-events.yaml
+  - argo-events.yaml
+  - argo-workflows.yaml
+  - nfs-server-provisioner.yaml
+  - doc.yaml
+  - custom-metrics-stackdriver-adapter.yaml
+
+namespace: argocd

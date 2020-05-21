@@ -1,0 +1,30 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: nfs-server-provisioner
+  labels:
+    group: infra-shared
+    sub-group: data
+spec:
+  project: default
+  source:
+    repoURL: "https://kubernetes-charts.storage.googleapis.com"
+    targetRevision: 1.0.0
+    chart: nfs-server-provisioner
+    helm:
+      values: |
+        storageClass:
+          # intentional so we don't loose data
+          reclaimPolicy: "Retain"
+        persistence:
+          enabled: true
+          size: 300Gi
+        nodeSelector:
+          cloud.google.com/gke-nodepool: default-pool
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: data
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true

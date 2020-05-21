@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tensorleap-pysvcs
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: tensorleap-pysvc
+  template:
+    metadata:
+      labels:
+        app: tensorleap-pysvc
+    spec:
+      containers:
+        - image: gcr.io/tensorleap-dev-3/tensorleap:azriel-gpu-v1
+          name: tensorleap-cpu
+          envFrom:
+            - configMapRef:
+                name: tensorleap-env-configmap
+          resources: {}

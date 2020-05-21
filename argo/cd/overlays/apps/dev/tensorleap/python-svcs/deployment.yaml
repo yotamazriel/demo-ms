@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tensorleap-pysvcs
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: tensorleap-pysvc
+  template:
+    metadata:
+      labels:
+        app: tensorleap-pysvc
+        # name?
+    spec:
+      containers:
+        - image: gcr.io/tensorleap-dev-3/tensorleap-cpu:v1
+          name: tensorleap-cpu
+          env:
+            - name: GOOGLE_APPLICATION_CREDENTIALS
+              value: /app/secrets/google/key.json
+          envFrom:
+            - configMapRef:
+                name: tensorleap-env-configmap
+          volumeMounts:
+            - name: my-pvc-nfs
+              mountPath: /nfs/
+            - name: secrets
+              mountPath: /app/secrets/google
+              readOnly: true
+            - name: config-volume
+              mountPath: /app/src/config.yaml
+              subPath: config.yaml
+          resources: {}
+      nodeSelector:
+        cloud.google.com/gke-nodepool: python-services
+      volumes:
+        - name: my-pvc-nfs
+          persistentVolumeClaim:
+            claimName: nfs-data
+        - name: secrets
+          secret:
+            secretName: tensorleap-secrets
+        - name: config-volume
+          configMap:
+            name: tensorleap-py-configmap

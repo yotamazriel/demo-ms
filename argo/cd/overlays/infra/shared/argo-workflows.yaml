@@ -1,0 +1,18 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: argo-workflows
+  labels:
+    group: ci-cd
+spec:
+  project: default
+  source:
+    repoURL: git@github.com:tensorleap/infra.git
+    path: argo/cd/overlays/infra/shared/argo-workflows
+  destination:
+    namespace: argo
+    server: https://kubernetes.default.svc
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true

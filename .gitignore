@@ -1,0 +1,76 @@
+# ignore mac internal files
+**/.DS_Store
+*.vscode/settings.json
+
+#  Local .terraform directories
+**/.terraform/*
+**/*.plan
+**/tfplan
+# .tfstate files
+# *.tfstate
+*.tfstate.*
+.DS_Store
+.history
+**/.history
+
+
+# package directories
+node_modules
+jspm_packages
+
+# Serverless directories
+.serverless
+
+data/
+*.log
+
+*.plan
+.DS_Store
+.tmp/
+.terraform/
+.temp/
+.env
+.webpack/
+.dynamodb
+
+# temp secret for kustomzie ...
+# argo ssh key
+argo/cd/overlays/infra/shared/argo-workflows/resources/github-secret.yml
+argo/cd/overlays/infra/shared/argo-workflows/resources/key.json
+
+# temp
+temp/
+terraform/base/README_.md
+terraform/base/backend._tf
+terraform/base/diagram.gcpdraw
+terraform/base/diagram.png
+terraform/base/kubecofnig
+terraform/envs/_dev/
+terraform/envs/dev/apps.tf
+terraform/envs/dev/backend.tf
+terraform/envs/dev/data.tf
+terraform/envs/dev/gke copy._tf
+terraform/envs/dev/gke.tf
+terraform/envs/dev/locals.tf
+terraform/envs/dev/project.tf
+terraform/envs/dev/provider.tf
+terraform/envs/operations/
+terraform/envs/prod/
+terraform/envs/shared/
+terraform/envs/test/
+terraform/helpers/
+terraform/modules/cloud-foundation-fabric/.ci/
+terraform/modules/cloud-foundation-fabric/.gitignore
+terraform/modules/cloud-foundation-fabric/CHANGELOG.md
+terraform/modules/cloud-foundation-fabric/LICENSE
+terraform/modules/cloud-foundation-fabric/README.md
+terraform/modules/cloud-foundation-fabric/_old_git_root_/
+terraform/modules/cloud-foundation-fabric/docker-images/
+terraform/modules/cloud-foundation-fabric/foundations/
+terraform/modules/cloud-foundation-fabric/infrastructure/
+terraform/modules/cloud-foundation-fabric/tests/
+terraform/modules/cloud-foundation-fabric/tools/
+terraform/modules/elb-gs-site/
+terraform/pub-sub-sample/
+.deploy/gcr-json-key.yaml
+argo/cd/overlays/infra/shared/secrets

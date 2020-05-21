@@ -1,0 +1,5 @@
+# used to convert key value pairs of non-secret data to environment variables based on config/index.js
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: tensorleap-node-server-env-configmap

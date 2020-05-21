@@ -1,0 +1,15 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  # origin: https://argoproj.github.io/argo-events/installation/
+  # - installation.yaml
+  - argo-events-sa.yaml
+  - argo-events-role.yaml
+  - sensor-crd.yaml
+  - gateway-crd.yaml
+  - event-source-crd.yaml
+  - sensor-controller-configmap.yaml
+  - gateway-controller-configmap.yaml
+  - sensor-controller-deployment.yaml
+  - gateway-controller-deployment.yaml

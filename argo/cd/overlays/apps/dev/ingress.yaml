@@ -1,0 +1,38 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: ingress-fe
+  labels:
+    group: dev
+    sub-group: data
+spec:
+  destination:
+    server: "https://kubernetes.default.svc"
+    namespace: dev
+  project: default
+  source:
+    chart: nginx-ingress
+    helm:
+      values: |
+        controller:
+          containerPort:
+            http: 80
+            https: 443
+          publishService:
+            enabled: true
+          ingressClass: nginx-fe
+          service:
+            annotations:
+              external-dns.alpha.kubernetes.io/hostname: app-ing.dev.tensorleap.ai
+          autoscaling:
+            enabled: true
+            maxReplicas: 6
+            minReplicas: 2
+            targetCPUUtilizationPercentage: 50
+            targetMemoryUtilizationPercentage: 50
+    repoURL: https://kubernetes-charts.storage.googleapis.com
+    targetRevision: 1.36.3
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true

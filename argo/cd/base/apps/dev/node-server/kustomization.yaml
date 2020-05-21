@@ -1,0 +1,21 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - ./service.yaml
+  - ./node-server-env-configmap.yaml
+  - ./node-server-files-configmap.yaml
+  - ./secrets.yaml
+  - ./deployment.yaml
+#TODO
+
+# secretGenerator: - deprecation ?!
+# configMapGenerator:
+#   - name: node-server-files-configmap
+#     files:
+#       - configs/development.json
+#   - name: node-server-env-configmap
+#     literals:
+#       - LOG_LEVEL=info
+#       - NODE_ENV=production
+#       - PUBSUB_PREFIX="_prod"

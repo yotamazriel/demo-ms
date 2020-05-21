@@ -1,0 +1,38 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - ../../../../base/apps/dev/tensorleap/
+  - ./secrets.yaml
+    # argo/cd/base/apps/dev/tensorleap/nodepool
+
+patchesStrategicMerge:
+  - ./python-svcs/deployment.yaml
+  - ./python-svcs/hpa.yaml
+  - ./python-svcs/env-configmap.yaml
+  - ./python-svcs/pvc.yaml
+  # - ./tesla-k80/deployment.yaml
+  # - ./tesla-k80/hpa.yaml
+  # - ./tesla-k80/env-configmap.yaml
+  # - ./tesla-v100/deployment.yaml
+  # - ./tesla-v100/hpa.yaml
+  # - ./tesla-v100/env-configmap.yaml
+
+# patches:
+#   - path: patch.yaml
+#     target:
+#       kind: Deployment
+
+namespace: dev
+
+images:
+  - name: gcr.io/tensorleap-dev-3/tensorleap-cpu
+    newTag: "v1"
+  - name: gcr.io/tensorleap-dev-3/tensorleap-gpu
+    newTag: "v1"
+
+# secretGenerator: - deprecation ?!
+configMapGenerator:
+  - name: tensorleap-py-configmap
+    files:
+      - assets/config.yaml

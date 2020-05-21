@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: gateway-controller-configmap
+data:
+  config: |
+    instanceID: argo-events

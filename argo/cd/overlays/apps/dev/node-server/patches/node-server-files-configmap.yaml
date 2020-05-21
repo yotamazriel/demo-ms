@@ -1,0 +1,25 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: tensorleap-node-server-files-configmap
+data:
+  production.json: |-
+    {
+      "pubsub_prefix": "prod_",
+      "processing_cfg": [
+        {
+          "config": "tesla-k80",
+          "name": "Tesla_K80",
+          "type": "autoscaler",
+          "pubsub_topic": "prod_commandcontrol-tesla-k80",
+          "pubsub_topic_aug": "prod_commandcontrol-python-services"
+        },
+        {
+          "config": "python-services",
+          "name": "python-services",
+          "type": "autoscaler",
+          "pubsub_topic": "commandcontrol-python-services",
+          "pubsub_topic_aug": "commandcontrol-python-services"
+        }
+      ]
+    }

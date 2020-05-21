@@ -1,0 +1,110 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tensorleap-node-server
+spec:
+  selector:
+    matchLabels:
+      app: tensorleap-node-server
+  template:
+    metadata:
+      labels:
+        app: tensorleap-node-server
+    spec:
+      initContainers:
+        # - name: init-check-mongo-dns
+        #   image: busybox:1.28
+        #   imagePullPolicy: IfNotPresent
+        #   command: ["sh", "-c", "printenv"]
+        - name: init-mongo
+          image: gcr.io/tensorleap-dev-3/node-server:latest
+          imagePullPolicy: IfNotPresent
+          command: ["sh", "-c", "printenv && node user_init.js; exit 0"]
+          # command: ["sh", "-c", "printenv"]
+          # "until nslookup mongodb.dev-data.svc.cluster.local; do echo waiting for mongodb.dev-data.svc.cluster.local; which telnet sleep 2; done;",
+          envFrom:
+            - configMapRef:
+                name: tensorleap-node-server-env-configmap
+          env:
+            - name: JWT_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  # get the secret we use in the jwt_token secret in current namespace
+                  name: tensorleap-node-server-secrets
+                  key: jwt_token
+            - name: MONGO_URI
+              valueFrom:
+                secretKeyRef:
+                  # get the secret we use in the mongo_uri secret in current namespace
+                  name: tensorleap-node-server-secrets
+                  key: mongo_uri
+            - name: DEFAULT_USER_PASS
+              valueFrom:
+                secretKeyRef:
+                  # get the secret we use in the mongo_uri secret in current namespace
+                  name: tensorleap-node-server-secrets
+                  key: default_user_pass
+          resources:
+            limits:
+              cpu: 100m
+              memory: 2Gi
+            requests:
+              cpu: 50m
+              memory: 1Gi
+      containers:
+        - name: tensorleap-node-server
+          image: gcr.io/tensorleap-dev-3/node-server:latest
+          imagePullPolicy: Always
+          ports:
+            - name: http
+              containerPort: 4000
+          # take key-value pairs from node-server-evn-config configmap and map them to env vars e.g:
+          envFrom:
+            - configMapRef:
+                name: tensorleap-node-server-env-configmap
+          env:
+            - name: JWT_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  # get the secret we use in the jwt_token secret in current namespace
+                  name: tensorleap-node-server-secrets
+                  key: jwt_token
+            - name: MONGO_URI
+              valueFrom:
+                secretKeyRef:
+                  # get the secret we use in the mongo_uri secret in current namespace
+                  name: tensorleap-node-server-secrets
+                  key: mongo_uri
+            # This one is a bit tricky it's a path to a file we load from a secret,
+            # could also be passed from tensorleap-node-server-env-configmap
+            - name: GOOGLE_APPLICATION_CREDENTIALS
+              value: /app/secrets/google/key.json
+          volumeMounts:
+            # any file you wish to map into /app/config can be added to the
+            - name: config-volume
+              mountPath: /app/config/production.json
+              subPath: production.json
+            - name: secrets
+              mountPath: /app/secrets/google/key.json
+              subPath: key.json
+              readOnly: true
+          resources:
+            {}
+            # limits:
+            #   memory: 500m
+            #   cpu: 4m
+            # requests:
+            #   memory: 250m
+            #   cpu: 2m
+      volumes:
+        - name: secrets
+          secret:
+            secretName: tensorleap-node-server-secrets
+        # Comment out to use default config/production.json
+        - name: config-volume
+          configMap:
+            name: tensorleap-node-server-files-configmap
+        #     # optional map only a single entry from the configmap
+        # items:
+        #   - key: production.json
+        #     path: production.json

@@ -1,0 +1,5 @@
+# used to load files of non-secret data and mount usually under /app/config
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: tensorleap-node-server-files-configmap

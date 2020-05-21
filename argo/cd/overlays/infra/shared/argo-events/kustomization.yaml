@@ -1,0 +1,16 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+patchesStrategicMerge:
+  - patches/gateway-controller-configmap.yaml
+  - patches/sensor-controller-configmap.yaml
+resources:
+  # - github.com/tensorleap/web-app.git/.deploy/cluster-install?ref=development solve git protocol issue ?!
+  - ../../../../base/infra/shared/argo-events
+  - resources/argo-events-cluster-roles.yaml
+  - resources/argo-events-cluster-role-bindings.yaml
+  - resources/github-ingress.yaml
+  - resources/github-gateway.yaml
+  - resources/github-event-source.yaml
+
+namespace: argo-events

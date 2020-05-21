@@ -1,0 +1,20 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: test
+
+commonLabels:
+  group: test
+  variant: shared
+
+commonAnnotations:
+  environment: test
+  group: infra-tests
+
+bases:
+  - test-container
+
+resources:
+  - nfs-client-1
+  - nfs-client-2
+  - nfs-client-3
+  - pvc.yaml

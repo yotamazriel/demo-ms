@@ -1,0 +1,20 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tensorleap-web
+spec:
+  selector:
+    matchLabels:
+      app: tensorleap-web
+  template:
+    metadata:
+      labels:
+        app: tensorleap-web
+    spec:
+      containers:
+        - name: web-app
+          image: gcr.io/tensorleap-dev-3/web-app:latest
+          imagePullPolicy: Always
+          ports:
+            - name: http
+              containerPort: 80

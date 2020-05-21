@@ -1,0 +1,47 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Gateway
+metadata:
+  name: github-gateway
+  labels:
+    # gateway controller with instanceId "argo-events" will process this gateway
+    gateways.argoproj.io/gateway-controller-instanceid: argo-events
+spec:
+  type: github
+  eventSourceRef:
+    name: github-event-source
+  template:
+    metadata:
+      name: github-gateway
+      namespace: argo-events
+      labels:
+        gateway-name: github-gateway
+    spec:
+      containers:
+        - name: gateway-client
+          image: argoproj/gateway-client:v0.14.0
+          imagePullPolicy: Always
+          command: ["/bin/gateway-client"]
+        - name: github-events
+          image: argoproj/github-gateway:v0.14.0
+          imagePullPolicy: Always
+          command: ["/bin/github-gateway"]
+      serviceAccountName: argo-events-sa
+  service:
+    metadata:
+      name: github-gateway-svc
+    spec:
+      selector:
+        gateway-name: github-gateway
+      ports:
+        - name: github-gateway
+          port: 12000
+          targetPort: 12000
+      # type: LoadBalancer
+  subscribers:
+    http:
+      # - "http://<sensor-name>.argo-events.svc:<sensor-port>/"
+      - "http://github-web-app-sensor-development.argo-events.svc:9300/"
+      - "http://github-tensorleap-sensor-development.argo-events.svc:9300/"
+      - "http://github-node-server-sensor-development.argo-events.svc:9300/"
+      - "http://github-test-sensor-development.argo-events.svc:9300/"
+      - "http://github-sensor-tensorleap-doc-master.argo-events.svc:9300/"

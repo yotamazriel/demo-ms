@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: tensorleap-node-server-env-configmap
+data:
+  LOG_LEVEL: info
+  NODE_ENV: production
+  DEFAULT_USER_EMAIL: admin@tensorleap.ai
+  KIBANA_URL: http://kibana-kibana:5601
+  # DEFAULT_USER_PASS: admin@tensorleap.ai
+  # GOOGLE_APPLICATION_CREDENTIALS: /app/secrets/google/key.json
+  # JWT_SECRET: xxxxx # move to secret !
+  # PUBSUB_PREFIX: -> use whats in /app/config/production.json
+  # IP_ADDRESS: -> use default
+  # PORT: -> use default
+  # PRETTY_LOGS: -> use default
+  # MONGO_URI - loaded from secret

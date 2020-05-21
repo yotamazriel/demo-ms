@@ -1,0 +1,28 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: ci-nfs-server-provisioner
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: "https://kubernetes-charts.storage.googleapis.com"
+    targetRevision: 1.0.0
+    chart: nfs-server-provisioner
+    helm:
+      values: |
+        storageClass:
+          name: nfs-ci
+          reclaimPolicy: "Retain"
+        persistence:
+          enabled: true
+          size: 300Gi
+        nodeSelector:
+          cloud.google.com/gke-nodepool: default-pool
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: dev-data
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true

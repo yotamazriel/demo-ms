@@ -1,0 +1,20 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: tensorleap-web
+  namespace: argocd
+  labels:
+    group: Frontend
+spec:
+  project: default
+  source:
+    repoURL: git@github.com:tensorleap/infra.git
+    path: argo/cd/overlays/apps/dev/web-app
+    # targetRevision: master
+  destination:
+    namespace: dev
+    server: https://kubernetes.default.svc
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true

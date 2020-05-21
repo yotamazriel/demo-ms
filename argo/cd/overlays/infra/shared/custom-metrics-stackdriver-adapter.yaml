@@ -1,0 +1,66 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: custom-metrics-stackdriver-adapter
+  labels:
+    group: infra-shared
+spec:
+  project: default
+  source:
+    repoURL: git@github.com:tensorleap/infra.git
+    path: argo/cd/overlays/infra/shared/custom-metrics-stackdriver-adapter
+  destination:
+    namespace: custom-metrics
+    server: https://kubernetes.default.svc
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+# apiVersion: apps/v1
+# kind: Deployment
+# metadata:
+#   name: custom-metrics-stackdriver-adapter
+#   labels:
+#     k8s-app: custom-metrics-stackdriver-adapter
+#     run: custom-metrics-stackdriver-adapter
+#   # namespace: custom-metrics
+# spec:
+#   replicas: 1
+#   revisionHistoryLimit: 10
+#   selector:
+#     matchLabels:
+#       k8s-app: custom-metrics-stackdriver-adapter
+#       run: custom-metrics-stackdriver-adapter
+#   strategy:
+#     rollingUpdate:
+#       maxSurge: 1
+#       maxUnavailable: 1
+#     type: RollingUpdate
+#   template:
+#     metadata:
+#       labels:
+#         k8s-app: custom-metrics-stackdriver-adapter
+#         kubernetes.io/cluster-service: "true"
+#         run: custom-metrics-stackdriver-adapter
+#     spec:
+#       containers:
+#         - command:
+#             - /adapter
+#             - --use-new-resource-model=false
+#           image: gcr.io/google-containers/custom-metrics-stackdriver-adapter:v0.9.0
+#           imagePullPolicy: Always
+#           name: pod-custom-metrics-stackdriver-adapter
+#           resources:
+#             limits:
+#               cpu: 250m
+#               memory: 200Mi
+#             requests:
+#               cpu: 250m
+#               memory: 200Mi
+#       restartPolicy: Always
+#       schedulerName: default-scheduler
+#       securityContext: {}
+#       serviceAccount: custom-metrics-stackdriver-adapter
+#       serviceAccountName: custom-metrics-stackdriver-adapter
+#       terminationGracePeriodSeconds: 30
+# status: {}

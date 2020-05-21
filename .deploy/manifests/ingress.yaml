@@ -1,0 +1,12 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: tensorleap-doc
+spec:
+  rules:
+    - http:
+        paths:
+          - backend:
+              serviceName: tensorleap-doc
+              servicePort: http
+            path: /

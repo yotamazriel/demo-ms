@@ -1,0 +1,15 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+patchesStrategicMerge:
+  - patches/service.yaml
+  - patches/ingress.yaml
+  - patches/deployment.yaml
+
+resources:
+  - ../ci
+  - ../manifests
+
+images:
+  - name: gcr.io/tensorleap-dev-3/tensorleap-doc
+    newTag: latest

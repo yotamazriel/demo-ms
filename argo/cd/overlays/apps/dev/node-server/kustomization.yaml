@@ -1,0 +1,18 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+  # - patches/ingress.yaml
+patchesStrategicMerge:
+- patches/deployment.yaml
+- patches/service.yaml
+- patches/node-server-env-configmap.yaml
+- patches/node-server-files-configmap.yaml
+- patches/secrets.yaml
+
+resources:
+- ../../../../base/apps/dev/node-server
+
+namespace: dev
+
+images:
+- name: gcr.io/tensorleap-dev-3/node-server
+  newTag: ee2546f

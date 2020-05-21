@@ -1,0 +1,10 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+patchesStrategicMerge:
+  - patches/argo-server-service.yaml
+  - patches/workflow-controller-metrics.yaml
+
+resources:
+  - resources/argo-server-ingress.yaml
+  - resources/install.yaml

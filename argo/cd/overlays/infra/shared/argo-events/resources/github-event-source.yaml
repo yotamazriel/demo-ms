@@ -1,0 +1,103 @@
+# Info on GitHub Webhook: https://developer.github.com/v3/repos/hooks/#create-a-hook
+apiVersion: argoproj.io/v1alpha1
+kind: EventSource
+metadata:
+  name: github-event-source
+spec:
+  type: github
+  github:
+    tensorleap:
+      owner: tensorleap
+      repository: tensorleap
+      webhook:
+        endpoint: /tensorleap-push
+        port: "12000"
+        method: POST
+        url: https://github.dev.tensorleap.ai
+      events:
+        - "push"
+      apiToken:
+        name: github-secret
+        key: token
+      webhookSecret:
+        name: github-secret
+        key: secret
+      insecure: true
+      active: true
+      contentType: json
+    web-app:
+      owner: tensorleap
+      repository: web-app
+      webhook:
+        endpoint: /web-app-push
+        port: "12000"
+        method: POST
+        url: https://github.dev.tensorleap.ai
+      events:
+        - "push"
+      apiToken:
+        name: github-secret
+        key: token
+      webhookSecret:
+        name: github-secret
+        key: secret
+      insecure: true
+      active: true
+      contentType: json
+    node-server:
+      owner: tensorleap
+      repository: node-server
+      webhook:
+        endpoint: /node-server-push
+        port: "12000"
+        method: POST
+        url: https://github.dev.tensorleap.ai
+      events:
+        - "push"
+      apiToken:
+        name: github-secret
+        key: token
+      webhookSecret:
+        name: github-secret
+        key: secret
+      insecure: true
+      active: true
+      contentType: json
+    infra:
+      owner: tensorleap
+      repository: infra
+      webhook:
+        endpoint: /infra-push
+        port: "12000"
+        method: POST
+        url: https://github.dev.tensorleap.ai
+      events:
+        - "push"
+      apiToken:
+        name: github-secret
+        key: token
+      webhookSecret:
+        name: github-secret
+        key: secret
+      insecure: true
+      active: true
+      contentType: json
+    tensorleap-test:
+      owner: hagzag
+      repository: arg-ws-test
+      webhook:
+        endpoint: /arg-ws-test
+        port: "12000"
+        method: POST
+        url: https://github.dev.tensorleap.ai
+      events:
+        - "push"
+      apiToken:
+        name: github-secret
+        key: token
+      webhookSecret:
+        name: github-secret
+        key: secret
+      insecure: true
+      active: true
+      contentType: json

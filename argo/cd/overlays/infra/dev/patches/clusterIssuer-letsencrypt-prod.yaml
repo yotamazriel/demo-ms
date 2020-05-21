@@ -1,0 +1,13 @@
+apiVersion: cert-manager.io/v1alpha2
+kind: ClusterIssuer
+metadata:
+  name: letsencrypt-prod
+spec:
+  acme:
+    solvers:
+      - selector:
+          dnsZones:
+            - "dev.tensorleap.ai"
+        dns01:
+          clouddns:
+            project: tensorleap-dev-3

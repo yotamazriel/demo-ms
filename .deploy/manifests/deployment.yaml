@@ -1,0 +1,20 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tensorleap-doc
+spec:
+  selector:
+    matchLabels:
+      app: tensorleap-doc
+  template:
+    metadata:
+      labels:
+        app: tensorleap-doc
+    spec:
+      containers:
+        - name: doc
+          image: gcr.io/tensorleap-dev-3/tensorleap-doc:latest
+          imagePullPolicy: Always
+          ports:
+            - name: http
+              containerPort: 80

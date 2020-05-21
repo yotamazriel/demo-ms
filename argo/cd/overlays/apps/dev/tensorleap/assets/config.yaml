@@ -1,0 +1,100 @@
+environment_variable:
+  PUBSUB_TOPIC:
+    - gcp.pubsub.topic
+  PUBSUB_SUB:
+    - gcp.pubsub.subscription
+  FEEDBACK_TOPIC:
+    - gcp.pubsub.feedback_topic
+  ELASTIC_HOST:
+    - elastic.host
+  ELASTIC_INDEX:
+    - elastic.index
+  FLUENT_HOST:
+    - tllogger.handlers.fluent.host
+  FLUENT_PORT:
+    - tllogger.handlers.fluent.port
+  FLUENT_TAG:
+    - tllogger.handlers.fluent.tag
+  FLUENT_LOG_LEVEL:
+    - tllogger.handlers.fluent.log_level
+  MOUNTHPATH:
+    - global.datas.ets_folder
+  AUTH_FILE:
+    - gcp.auth_file
+  GOOGLE_APPLICATION_CREDENTIALS:
+    - gcp.auth_file
+
+global:
+  datasets_folder: "/Users/yotamazriel/Documents/data/"
+
+elastic:
+  use_elastic: false
+  host: "0"
+  index: "staging"
+
+gcp_stashedgcp:
+  project: "splendid-flow-231921"
+  auth_file: "../config/splendid-flow-231921-9849efd1dee2.json"
+  pubsub:
+    topic: "projects/splendid-flow-231921/topics/doron_commandcontrol-local_host"
+    feedback_topic: "projects/splendid-flow-231921/topics/doron_feedback"
+    subscription: "projects/splendid-flow-231921/subscriptions/doron_pysubscription-local_host"
+  storage:
+    session_bucket: "datasets-reteai"
+
+gcp:
+  project: "tensorleap-dev-3"
+  auth_file: "/app/secrets/google/key.json"
+  pubsub:
+    topic: "projects/tensorleap-dev-3/topics/dev_commandcontrol-local_host"
+    feedback_topic: "projects/tensorleap-dev-3/topics/yotam_feedback"
+    subscription: "projects/tensorleap-dev-3/subscriptions/yotam_pysubscription-local_host"
+  storage:
+    session_bucket: "session_bucket-dev"
+
+tllogger:
+  formatters:
+    brief:
+      fmt: "%(message)s"
+
+    default:
+      fmt: "%(asctime)s %(levelname)-8s %(name)-15s %(message)s"
+      datefmt: "%Y-%m-%d %H:%M:%S"
+
+    fluent_fmt:
+      fmt:
+        level: "%(levelname)s"
+        hostname: "%(hostname)s"
+        where: "%(module)s.%(funcName)s"
+        asctime: "%(asctime)s"
+        levelname: "%(levelname)s"
+        process: "%(process)d"
+        thread: "%(thread)d"
+        module: "%(module)s"
+        filename: "%(filename)s"
+        funcName: "%(funcName)s"
+        lineno: "%(lineno)d"
+        message: "%(message)s"
+
+  handlers:
+    console:
+      class: logging.StreamHandler
+      log_level: DEBUG
+      formatter: default
+      stream: ext://sys.stdout
+
+    fluent:
+      class: fluent.handler.FluentHandler
+      host: localhost
+      port: 24224
+      tag: "app.follow"
+      buffer_overflow_handler: overflow_handler
+      formatter: fluent_fmt
+      log_level: DEBUG
+
+    RotatingFileHandler:
+      filename: "base_logger.log"
+      max_bytes: 200000000
+      formatter: default
+      backup_count: 5
+      log_level: INFO
